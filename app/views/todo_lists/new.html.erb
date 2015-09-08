@@ -1,5 +1,6 @@
-<h1>New Todo List</h1>
+<h1 class="todo_list_title">List for: <strong><%= Time.new.strftime("%A, %Y-%m-%d") %></strong></h1>
 
-<%= render 'form' %>
+<div class="forms"><%= render 'form' %></div>
 
-<%= link_to 'Back', todo_lists_path %>
+<div class="links"><%= link_to 'Back', todo_lists_path %></div>
+
