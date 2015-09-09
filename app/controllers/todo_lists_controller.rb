@@ -1,6 +1,7 @@
 class TodoListsController < ApplicationController
   before_action :set_todo_list, only: [:show, :edit, :update, :destroy]
 
+
   # GET /todo_lists
   # GET /todo_lists.json
   def index
@@ -14,7 +15,13 @@ class TodoListsController < ApplicationController
 
   # GET /todo_lists/new
   def new
-    @todo_list = TodoList.new
+    
+    if  TodoList.last.created_at.strftime("%Y-%m-%d") == Time.now.strftime("%Y-%m-%d")
+        flash[:notice] = "Can't make more than one post per day"
+        redirect_to root_url and return
+    else
+      @todo_list = TodoList.new
+    end
   end
 
   # GET /todo_lists/1/edit
@@ -24,9 +31,10 @@ class TodoListsController < ApplicationController
   # POST /todo_lists
   # POST /todo_lists.json
   def create
-    @todo_list = TodoList.new(todo_list_params)
-
-    respond_to do |format|
+ 
+    if TodoList.last.nil?
+      @todo_list = TodoList.new(todo_list_params)
+      respond_to do |format|
       if @todo_list.save
         format.html { redirect_to @todo_list, notice: 'Todo list was successfully created.' }
         format.json { render :show, status: :created, location: @todo_list }
@@ -35,7 +43,34 @@ class TodoListsController < ApplicationController
         format.json { render json: @todo_list.errors, status: :unprocessable_entity }
       end
     end
-  end
+    end
+    
+    
+    if !TodoList.blank?
+      if  TodoList.last.created_at.strftime("%Y-%m-%d") == Time.now.strftime("%Y-%m-%d")
+        flash[:notice] = "Can't make more than one post per day"
+        redirect_to root_url and return
+      end
+      
+      
+      @todo_list = TodoList.new(todo_list_params)
+      respond_to do |format|
+      if @todo_list.save
+        format.html { redirect_to @todo_list, notice: 'Todo list was successfully created.' }
+        format.json { render :show, status: :created, location: @todo_list }
+      else
+        format.html { render :new }
+        format.json { render json: @todo_list.errors, status: :unprocessable_entity }
+      end
+    end
+      
+    end
+    
+  end # ends create
+    
+    
+  
+
 
   # PATCH/PUT /todo_lists/1
   # PATCH/PUT /todo_lists/1.json
@@ -69,6 +104,7 @@ class TodoListsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def todo_list_params
-      params.require(:todo_list).permit(:title, :description, :date)
+      params.require(:todo_list).permit(:title, :description)
     end
+  
 end

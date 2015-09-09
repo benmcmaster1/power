@@ -9,7 +9,8 @@ Rails.application.routes.draw do
       end
     end
   end
+  
 
-  root 'pages#calendar'
+  root 'todo_lists#index'
   
 end
